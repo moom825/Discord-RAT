@@ -8,7 +8,7 @@ This is a RAT controlled over Discord with over 50 post exploitation modules.
 This tool is for educational use only, the author will not be held responsible for any misuse of this tool.
 
 ## **Credit**
-This project was origanly made by https://github.com/Sp00p64/DiscordRAT, this entire readme.md is made by him too.
+This project was origanly made by https://github.com/Sp00p64/DiscordRAT, this entire readme.md is made by him too.\
 Credit goes to him for all the original modules and readme.md
 
 ## **Setup Guide:**
