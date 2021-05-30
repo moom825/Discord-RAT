@@ -12,7 +12,7 @@ This project was origanly made by https://github.com/Sp00p64/DiscordRAT, this en
 Credit goes to him for all the original modules and readme.md
 
 ## **Setup Guide:**
-You will first need to register a bot with the Discord developper portal and then add the bot to the server that you want (make sure bot has administrator privileges).
+You will first need to register a bot with the Discord developer portal and then add the bot to the server that you want (make sure bot has administrator privileges).
 Once the bot is created copy the token of your bot and paste it at line 20.
 
 Install requirements :
