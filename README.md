@@ -100,3 +100,8 @@ If you encounter "AttributeError: module 'enum' has no attribute 'IntFlag'" whil
 ```
 pip uninstall enum34
 ```
+
+## **Contact:**
+feel free to contact me if you have any problems.
+I also make custom version of this tool, so if you want something added feel free to ask by joining by discord server.
+https://discord.gg/V589WeDmUr.
