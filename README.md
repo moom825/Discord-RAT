@@ -7,27 +7,27 @@ This is a RAT controlled over Discord with over 50 post exploitation modules.
 
 This tool is for educational use only, the author will not be held responsible for any misuse of this tool.
 
-## **Credit**
-This project was origanly made by https://github.com/Sp00p64/DiscordRAT, this entire readme.md is made by him too.\
+## **Credits**
+This project was originally made by https://github.com/Sp00p64/DiscordRAT, this entire readme.md is made by him too.\
 Credit goes to him for all the original modules and readme.md
 
 ## **Setup Guide:**
-You will first need to register a bot with the Discord developer portal and then add the bot to the server that you want (make sure bot has administrator privileges).
+You will first need to register a bot with the Discord developer portal and then add the bot to the Discord server that you want to use to control the bot (make sure the bot has administrator privileges in the Discord server).
 Once the bot is created copy the token of your bot and paste it at line 20.
 
 Install requirements :
 ```
 pip3 install -r requirements.txt
 ```
-Then if steps above were succesful after launching the python file by doing ```python DiscordRAT``` , it will create a new channel and post a message on the server with a generated session number.\
+Then if the steps above were successful, you can launch the python file by executing ```python DiscordRAT```. It will create a new channel and post a message on the server with a generated session number.\
 Now your bot should be available to use ! 
 
 **Requirements:**\
-Python3,Windows(x64)
+Python3, Windows(x64)
 
 ## **Modules**
 ```
-Availaible commands are :
+Available commands are :
 --> !message = Show a message box displaying your text / Syntax  = "!message example"
 --> !shell = Execute a shell command /Syntax  = "!shell whoami"
 --> !webcampic = Take a picture from the webcam
@@ -94,7 +94,7 @@ Availaible commands are :
 --> !startup = add file to startup(when computer go on this file starts)(Admin rights are required)
 ```
 ## **Advice:**
-If you have problems with the installation of win32api or other modules , try installing it in a python virtual environment.\
+If you have problems with the installation of win32api or other modules, try installing it in a python virtual environment.\
 Please avoid opening issues about module related errors as it is caused by your python installation and not a problem inherent of DiscordRAT.\
 If you encounter "AttributeError: module 'enum' has no attribute 'IntFlag'" while compiling to Pyinstaller please do :
 ```
@@ -102,6 +102,6 @@ pip uninstall enum34
 ```
 
 ## **Contact:**
-feel free to contact me if you have any problems.
+Feel free to contact me if you have any problems.
 I also make custom version of this tool, so if you want something added feel free to ask by joining by discord server.
 https://discord.gg/V589WeDmUr.
