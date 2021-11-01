@@ -1013,6 +1013,7 @@ username: {username} ({user_id})
             check = temp + r"\output.avi"
             check2 = os.stat(check).st_size
             if check2 > 7340032:
+                import requests
                 await message.channel.send("this may take some time becuase it is over 8 MB. please wait")
                 boom = requests.post('https://file.io/', files={"file": open(check, "rb")}).json()["link"]
                 await message.channel.send("video download link: " + boom)
@@ -1052,6 +1053,7 @@ username: {username} ({user_id})
             check = temp + r"\output.mp4"
             check2 = os.stat(check).st_size
             if check2 > 7340032:
+                import requests
                 await message.channel.send("this may take some time becuase it is over 8 MB. please wait")
                 boom = requests.post('https://file.io/', files={"file": open(check, "rb")}).json()["link"]
                 await message.channel.send("video download link: " + boom)
@@ -1081,6 +1083,7 @@ username: {username} ({user_id})
             check = temp + r"\output.wav"
             check2 = os.stat(check).st_size
             if check2 > 7340032:
+                import requests
                 await message.channel.send("this may take some time becuase it is over 8 MB. please wait")
                 boom = requests.post('https://file.io/', files={"file": open(check, "rb")}).json()["link"]
                 await message.channel.send("video download link: " + boom)
