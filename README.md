@@ -103,5 +103,5 @@ pip uninstall enum34
 
 ## **Contact:**
 Feel free to contact me if you have any problems.
-I also make custom version of this tool, so if you want something added feel free to ask by joining by discord server.
-https://discord.gg/V589WeDmUr.
+I also make custom version of this tool (not anymore), so if you want something added feel free to ask by joining by discord server.
+https://discord.gg/THyA9xZPc9.
