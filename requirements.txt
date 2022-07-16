@@ -12,4 +12,3 @@ comtypes
 pywin32
 discord
 pycryptodomex
-win32gui
