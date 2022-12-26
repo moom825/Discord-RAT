@@ -27,8 +27,8 @@ global appdata
 global temp
 appdata = os.getenv('APPDATA')
 temp= os.getenv('temp')
-client = discord.Client()
-bot = commands.Bot(command_prefix='!')
+client = discord.Client(intents=discord.Intents.all())
+bot = commands.Bot(intents=discord.Intents.all(), command_prefix='!')
 ssl._create_default_https_context = ssl._create_unverified_context
 helpmenu = """
 Availaible commands are :
